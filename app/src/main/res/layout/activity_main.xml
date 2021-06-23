@@ -7,9 +7,7 @@
     android:layout_width="match_parent">
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +18,7 @@
             android:id="@+id/monitor_usage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Monitor de Actividades!"
+            android:text="@string/titulo"
             android:width="200dp"
 
             app:layout_constraintStart_toStartOf="parent"
@@ -65,6 +63,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/foreground_only_location_button" />
 
+        <TextView
+            android:id="@+id/location_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Ubicacion"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/foreground_only_usage_stats_button" />
+
             <TextView
                 android:id="@+id/output_text_view"
                 android:overScrollMode="always"
@@ -80,11 +89,22 @@
                 android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/foreground_only_usage_stats_button"
+                app:layout_constraintTop_toBottomOf="@+id/location_title"
 
                 tools:text="Location" />
 
-            <TextView
+        <TextView
+            android:id="@+id/apps_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Aplicaciones agregadas"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/output_text_view" />
+
+        <TextView
                 android:id="@+id/output_text_view_apps"
                 android:overScrollMode="always"
                 android:scrollbarStyle="insideInset"
@@ -100,11 +120,24 @@
                 android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/output_text_view"
+                app:layout_constraintTop_toBottomOf="@+id/apps_title"
                 tools:text="Apps "/>
 
 
-            <TextView
+
+        <TextView
+            android:id="@+id/battery_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Porcentaje de batteria"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/output_text_view_apps" />
+
+
+        <TextView
                 android:id="@+id/output_text_battery"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -116,11 +149,23 @@
                 android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/output_text_view_apps"
+                app:layout_constraintTop_toBottomOf="@+id/battery_title"
                 android:scrollbars = "vertical"
                 tools:text="Battery "/>
 
-            <TextView
+        <TextView
+            android:id="@+id/memory_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Memoria de dispositivo"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/output_text_battery" />
+
+
+        <TextView
                 android:id="@+id/output_text_used_memory"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -132,11 +177,23 @@
                 android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/output_text_battery"
+                app:layout_constraintTop_toBottomOf="@+id/memory_title"
                 android:scrollbars = "vertical"
                 tools:text="Used Memory "/>
 
-            <TextView
+        <TextView
+            android:id="@+id/free_space_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Espacio libre"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/output_text_used_memory" />
+
+
+        <TextView
                 android:id="@+id/output_text_free_space"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -148,10 +205,22 @@
                 android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/output_text_used_memory"
+                app:layout_constraintTop_toBottomOf="@+id/free_space_title"
                 android:scrollbars = "vertical"
 
                 tools:text="Free Space "/>
+
+        <TextView
+            android:id="@+id/usage_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Uso de aplicaciones"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/output_text_free_space" />
+
 
         <TextView
             android:id="@+id/output_text_view_usage"
@@ -169,7 +238,7 @@
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/output_text_free_space"
+            app:layout_constraintTop_toBottomOf="@+id/usage_title"
             tools:text="Usage "/>
 
 

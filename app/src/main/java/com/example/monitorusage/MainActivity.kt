@@ -162,19 +162,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         }
 
-        //binding.outputTextViewApps.text = listOfInstalledNames.toString()
-        /**
-        for (app in apps) {
-            var label = packageManager.getApplicationLabel(app.applicationInfo)
-            if (!label.isNullOrBlank()) {
 
-
-
-
-            }
-
-        }
-         **/
         binding.outputTextViewApps.movementMethod = ScrollingMovementMethod()
         binding.outputTextViewApps.text = listOfInstalledNames.toString()
 
@@ -193,12 +181,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         binding.outputTextBattery.text = batteryPct.toString()
 
         //get Memory Info RAM
-
         val availableMemory = getAvailableMemory().availMem / 1024
         val totalMemory = getAvailableMemory().totalMem / 1024
         val usedMemory = totalMemory - availableMemory
 
-        binding.outputTextUsedMemory.text = "$availableMemory KB available, $totalMemory KB total, $usedMemory KB used"
+        binding.outputTextUsedMemory.text = "$availableMemory KB disponible, $totalMemory KB total, $usedMemory KB utilizado"
 
         // free space
         val freeInternalMemory = Environment.getDataDirectory()
@@ -207,18 +194,16 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         //val totalSpace = Environment.getRootDirectory().totalSpace
         val totalFreeSpace = freeExternalMemory + freeSpace
 
-        binding.outputTextFreeSpace.text = "$totalFreeSpace total free "
+        binding.outputTextFreeSpace.text = "$totalFreeSpace KB libres "
 
 
 
         // start your next activity
-
         foregroundOnlyUsageStatsButton.setOnClickListener{
             onClickStartSettings(view)
         }
 
         // get Usage for installed apps
-
         val statsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         var list: MutableList<UsageStats>
         val cal = Calendar.getInstance()
@@ -240,11 +225,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     usageList.add("${packageManager.getApplicationLabel(usageApp).toString()}" +
                             " ha usado: " + "%.2f".format(hours) +  " horas ")
                 }
-
             }
-
         }
-        binding.outputTextViewUsage.text = usageList.toString()
+        if (usageList.isNullOrEmpty()){
+            binding.outputTextViewUsage.text = "Debe habilitar permiso de uso para funcionamiento central"
+        }else{
+            binding.outputTextViewUsage.text = usageList.toString()
+        }
+
 
 
 
@@ -454,41 +442,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     fun onClickRequestPermission(view: View) {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.PACKAGE_USAGE_STATS
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                layout.showSnackbar(
-                    view,
-                    getString(R.string.permission_granted),
-                    Snackbar.LENGTH_INDEFINITE,
-                    null
-                ) {}
-            }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.PACKAGE_USAGE_STATS
-            ) -> {
-                layout.showSnackbar(
-                    view,
-                    getString(R.string.permission_required),
-                    Snackbar.LENGTH_INDEFINITE,
-                    getString(R.string.ok)
-                ) {
-                    requestPermissionLauncher.launch(
-                        Manifest.permission.PACKAGE_USAGE_STATS
-                    )
-                }
-            }
-
-            else -> {
-                requestPermissionLauncher.launch(
-                    Manifest.permission.PACKAGE_USAGE_STATS
-                )
-            }
-        }
+        layout.showSnackbar(view,"Necesita hacer login",Snackbar.LENGTH_INDEFINITE,null){}
     }
 
     private fun logResultsToScreen(output: String) {
