@@ -50,7 +50,7 @@ class MonitorUsageApplication: Application() {
 
         //val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(1, TimeUnit.DAYS)
         val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(constraints)
+            //.setConstraints(constraints)
             .build()
 
         Timber.d("WorkManager: Periodic Work request for sync is scheduled")

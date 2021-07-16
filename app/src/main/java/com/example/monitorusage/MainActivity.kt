@@ -25,10 +25,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.*
 import com.example.monitorusage.databinding.ActivityMainBinding
+import com.example.monitorusage.work.RefreshDataWorker
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.util.concurrent.TimeUnit
 import kotlin.math.round
 
 private const val TAG = "MainActivity"
@@ -56,6 +63,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private lateinit var foreground_only_usage_stats_button : Button
 
+    private val applicationScope = CoroutineScope(Dispatchers.Default)
+
     // Monitors connection to the while-in-use service.
     private val foregroundOnlyServiceConnection = object : ServiceConnection {
 
@@ -73,6 +82,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        delayedInit()
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         layout = binding.mainLayout
@@ -236,6 +246,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
 
 
+    }
+
+    private fun delayedInit() {
+        applicationScope.launch {
+            Timber.plant(Timber.DebugTree())
+            setupRecurringWork()
+        }
     }
 
     override fun onStart() {
@@ -486,6 +503,55 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         Log.d(TAG,"Requesting Setting requested")
         }
 
+    /**
+     * Setup WorkManager background job to 'fetch' new network data daily.
+     */
+    private fun setupRecurringWork() {
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .setRequiresCharging(true)
+            .setRequiresBatteryNotLow(true)
+            .apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    setRequiresDeviceIdle(true)
+                }
+            }
+            .build()
+
+        //val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(1, TimeUnit.DAYS)
+        val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(15, TimeUnit.MINUTES)
+            //.setConstraints(constraints)
+            .build()
+
+
+        try{
+            Timber.d("WorkManager: Periodic Work request for sync is scheduled")
+            WorkManager.getInstance().enqueueUniquePeriodicWork(
+                RefreshDataWorker.WORK_NAME,
+                ExistingPeriodicWorkPolicy.KEEP,
+                repeatingRequest)
+        }catch (e: Exception){
+            Timber.d("WorkManager: Periodic Work error")
+            Timber.d(e)
+
+        }
+        /**
+         * WorkManager.getInstance().enqueueUniquePeriodicWork(
+        RefreshDataWorker.WORK_NAME,
+        ExistingPeriodicWorkPolicy.KEEP,
+        repeatingRequest)
+         */
+
+        /**
+        val uploadWorkRequest: WorkRequest =
+            OneTimeWorkRequestBuilder<RefreshDataWorker>()
+                .build()
+
+        WorkManager
+            .getInstance()
+            .enqueue(uploadWorkRequest)**/
+    }
 
     }
 

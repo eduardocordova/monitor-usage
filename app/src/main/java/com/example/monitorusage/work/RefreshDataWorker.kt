@@ -31,10 +31,11 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         //val database = getDatabase(applicationContext)
         //val repository = VideosRepository(database)
-
+        Timber.d("WorkManager: Work request for setup is run")
         try {
             Timber.d("WorkManager: Work request for sync is run")
         } catch (e: HttpException) {
+            Timber.d("WorkManager: Work request for retry is run")
             return Result.retry()
         }
 
