@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private fun delayedInit() {
         applicationScope.launch {
             Timber.plant(Timber.DebugTree())
-            setupRecurringWork()
+            //setupRecurringWork()
         }
     }
 
@@ -458,8 +458,37 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+    private fun addImei(view: View): CharSequence? {
+        val imei = binding.textImei.text
+        return imei
+    }
+
+    private fun addSerial(view: View): CharSequence? {
+        val serial = binding.textSerial.text
+        return serial
+    }
+    companion object {
+        var IMEI = "user"
+        var SERIAL = "pass"
+    }
     fun onClickRequestPermission(view: View) {
-        layout.showSnackbar(view,"Necesita hacer login",Snackbar.LENGTH_INDEFINITE,null){}
+        val imei = addImei(view)
+        val serial = addSerial(view)
+        val sendRequest = false
+        //layout.showSnackbar(view,"Necesita hacer login",Snackbar.LENGTH_INDEFINITE,null){}
+        if (imei.isNullOrEmpty()){
+            layout.showSnackbar(view,"Necesita ingresar IMEI",Snackbar.LENGTH_LONG,null){}
+        }
+        if (serial.isNullOrEmpty()){
+            layout.showSnackbar(view,"Necesita ingresar Serial",Snackbar.LENGTH_LONG,null){}
+        }
+        if (!imei.isNullOrEmpty() && !serial.isNullOrEmpty()){
+            layout.showSnackbar(view,"Enviando informacion...",Snackbar.LENGTH_LONG,null){}
+            IMEI = imei.toString()
+            SERIAL = serial.toString()
+            setupRecurringWork()
+
+        }
     }
 
     private fun logResultsToScreen(output: String) {
@@ -508,6 +537,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
      */
     private fun setupRecurringWork() {
 
+
+
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.UNMETERED)
             .setRequiresCharging(true)
@@ -553,7 +584,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             .enqueue(uploadWorkRequest)**/
     }
 
-    }
+
+
+}
 
 
 

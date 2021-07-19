@@ -35,6 +35,27 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/monitor_usage"/>
 
+        <EditText
+            android:id="@+id/text_imei"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="18dp"
+            android:text="Ingrese Imei"
+            android:textSize="16sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/button"
+            app:layout_constraintStart_toEndOf="@+id/button" />
+
+        <EditText
+            android:id="@+id/text_serial"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="18dp"
+            android:text="Ingrese Serial"
+            android:textSize="16sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/button"
+            app:layout_constraintStart_toEndOf="@+id/text_imei" />/>
+
+
         <Button
             android:id="@+id/foreground_only_location_button"
             android:layout_width="0dp"
@@ -240,7 +261,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/usage_title"
             tools:text="Usage "/>
-
 
 
 
