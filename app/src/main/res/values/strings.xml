@@ -23,6 +23,10 @@
     <string name="permission_required">Acceso a camara requerido para mostrar avance de camara.</string>
     <string name="permission_granted">Permiso otorgado, puede usar la camara.</string>
     <string name="titulo">Mantenga sus tablet en linea!</string>
+    <string name="ingrese_imei">Ingrese Imei</string>
+    <string name="ingrese_serial">Ingrese Serial</string>
+    <string name="preference_file_imei">imei</string>
+    <string name="preference_file_serial">serial</string>
 
 
 </resources>

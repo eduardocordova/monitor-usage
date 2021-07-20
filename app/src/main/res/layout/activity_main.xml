@@ -40,7 +40,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="18dp"
-            android:text="Ingrese Imei"
+
             android:textSize="16sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/button"
             app:layout_constraintStart_toEndOf="@+id/button" />
@@ -50,7 +50,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="18dp"
-            android:text="Ingrese Serial"
+
             android:textSize="16sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/button"
             app:layout_constraintStart_toEndOf="@+id/text_imei" />/>

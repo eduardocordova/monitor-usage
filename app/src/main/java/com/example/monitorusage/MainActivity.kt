@@ -88,6 +88,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         layout = binding.mainLayout
         setContentView(view)
 
+
+
         foregroundOnlyBroadcastReceiver = ForegroundOnlyBroadcastReceiver()
 
         sharedPreferences =
@@ -255,6 +257,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+
+    // get shared preference imei and serial
+    /*
+    val sharedPrefImei =
+        getSharedPreferences(getString(R.string.preference_file_imei), Context.MODE_PRIVATE)
+    val sharedPrefSerial =
+        getSharedPreferences(getString(R.string.preference_file_serial), Context.MODE_PRIVATE)
+     */
     override fun onStart() {
         super.onStart()
 
@@ -266,7 +276,22 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val serviceIntent = Intent(this, ForegroundOnlyLocationService::class.java)
         bindService(serviceIntent, foregroundOnlyServiceConnection, Context.BIND_AUTO_CREATE)
 
+        val sharedPrefSerial= this.applicationContext.getSharedPreferences(
+            getString(R.string.preference_file_serial), Context.MODE_PRIVATE)
 
+        //val serial = sharedPrefSerial.getString(getString(R.string.preference_file_serial), getString(R.string.ingrese_serial))
+
+        val sharedPrefImei= this.applicationContext.getSharedPreferences(
+            getString(R.string.preference_file_imei), Context.MODE_PRIVATE)
+
+        // val imei = sharedPrefImei.getString(getString(R.string.preference_file_imei), getString(R.string.ingrese_imei))
+
+        val imei = sharedPreferences.getString(getString(R.string.preference_file_imei),  getString(R.string.ingrese_imei))
+        val serial = sharedPreferences.getString(getString(R.string.preference_file_serial),  getString(R.string.ingrese_serial))
+        binding.textSerial.setText(serial)
+        binding.textImei.setText(imei)
+        IMEI = imei.toString()
+        SERIAL = serial.toString()
     }
 
     override fun onResume() {
@@ -276,6 +301,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             IntentFilter(
                 ForegroundOnlyLocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
         )
+
 
     }
 
@@ -459,12 +485,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private fun addImei(view: View): CharSequence? {
-        val imei = binding.textImei.text
+        //val imei = sharedPreferences.getString(R.string.preference_file_imei.toString(),R.string.ingrese_imei.toString())
+        val imei = binding.textImei.toString()
         return imei
     }
 
     private fun addSerial(view: View): CharSequence? {
-        val serial = binding.textSerial.text
+        //val serial = sharedPreferences.getString(R.string.preference_file_serial.toString(),R.string.ingrese_serial.toString())
+        val serial = binding.textSerial.toString()
         return serial
     }
     companion object {
@@ -484,6 +512,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
         if (!imei.isNullOrEmpty() && !serial.isNullOrEmpty()){
             layout.showSnackbar(view,"Enviando informacion...",Snackbar.LENGTH_LONG,null){}
+
+            sharedPreferences.edit().putString(getString(R.string.preference_file_imei),  binding.textImei.text.toString()).apply()
+            sharedPreferences.edit().putString(getString(R.string.preference_file_serial),  binding.textSerial.text.toString()).apply()
+
             IMEI = imei.toString()
             SERIAL = serial.toString()
             setupRecurringWork()
