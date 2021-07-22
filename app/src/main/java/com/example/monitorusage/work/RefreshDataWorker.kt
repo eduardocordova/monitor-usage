@@ -218,7 +218,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
                         //val number2digits : Double = String.format("%.2f", hours).toDouble()
 
                         usageList.add("${applicationContext.packageManager.getApplicationLabel(usageApp).toString()}" +
-                                " ha usado: " + "%.2f".format(hours) +  " horas ")
+                                ": " + "%.2f".format(hours))
                     }
                 }
         }
@@ -226,7 +226,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
 
            return "Debe habilitar permiso de uso para funcionamiento central"
         }else{
-            return usageList.toString()
+            return usageList.distinct().toString()
         }
     }
     private fun getLatestLocation(): Task<Location> {
@@ -349,7 +349,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
         val totalMemory = getAvailableMemoryManager(appContext).totalMem / 1024
         val usedMemory = totalMemory - availableMemory
 
-        val memoryUsage = "$availableMemory KB disponible, $totalMemory KB total, $usedMemory KB utilizado"
+        val memoryUsage = "disponible: $availableMemory, total: $totalMemory, utilizado: $usedMemory"
         return memoryUsage
     }
 
@@ -388,8 +388,10 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
                 // it = newly added user parsed as response
                 // it?.id = newly added user ID
                 Timber.d("Workmanager: REST result = %s from %s", it?.result, it.imei)
+                Toast.makeText(applicationContext,"Informacion correctamente enviada!", Toast.LENGTH_LONG).show()
             } else {
                 Timber.d("Error registering new user")
+                Toast.makeText(applicationContext,"Revise los datos, permisos y envie de nuevo", Toast.LENGTH_LONG).show()
             }
         }
     }

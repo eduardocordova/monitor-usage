@@ -163,6 +163,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                             listOfInstalledNames.add(packageManager.getApplicationLabel(app).toString())
                             listOfInstalledPackageNames.add(app.packageName)
                             listOfInstalledApps.add(app)
+                            Timber.d("App: List of installed apps %s", listOfInstalledApps.toString())
                         }
 
                     }
@@ -224,25 +225,28 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         list = statsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, cal.getTimeInMillis(), System.currentTimeMillis())
         val usageList = mutableListOf<String>()
         for (usage in list){
-            if (usage.packageName in listOfInstalledPackageNames)
-            for (usageApp in listOfInstalledApps){
-                if (usage.packageName == usageApp.packageName){
-                    val df = DecimalFormat("#.##")
 
-                    val minutes : Long = usage.totalTimeVisible
-                    val hours = (minutes / 3600000).toFloat()
+            if (usage.packageName in listOfInstalledPackageNames && usage.packageName  !in usageList){
+                for (usageApp in listOfInstalledApps){
+                    if (usage.packageName == usageApp.packageName && !usageList.contains(usageApp.packageName)){
+                        val df = DecimalFormat("#.##")
 
-                    //val number2digits : Double = String.format("%.2f", hours).toDouble()
+                        val minutes : Long = usage.totalTimeVisible
+                        val hours = (minutes / 3600000).toFloat()
 
-                    usageList.add("${packageManager.getApplicationLabel(usageApp).toString()}" +
-                            " ha usado: " + "%.2f".format(hours) +  " horas ")
+                        //val number2digits : Double = String.format("%.2f", hours).toDouble()
+
+                        usageList.add("${packageManager.getApplicationLabel(usageApp).toString()}" +
+                                " ha usado: " + "%.2f".format(hours) +  " horas ")
+                    }
                 }
             }
+
         }
         if (usageList.isNullOrEmpty()){
             binding.outputTextViewUsage.text = "Debe habilitar permiso de uso para funcionamiento central"
         }else{
-            binding.outputTextViewUsage.text = usageList.toString()
+            binding.outputTextViewUsage.text = usageList.distinct().toString()
         }
 
 
@@ -302,6 +306,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 ForegroundOnlyLocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
         )
 
+        val imei = sharedPreferences.getString(getString(R.string.preference_file_imei),  getString(R.string.ingrese_imei))
+        val serial = sharedPreferences.getString(getString(R.string.preference_file_serial),  getString(R.string.ingrese_serial))
+        binding.textSerial.setText(serial)
+        binding.textImei.setText(imei)
 
     }
 
@@ -310,6 +318,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             foregroundOnlyBroadcastReceiver
         )
         super.onPause()
+        sharedPreferences.edit().putString(getString(R.string.preference_file_imei),  binding.textImei.text.toString()).apply()
+        sharedPreferences.edit().putString(getString(R.string.preference_file_serial),  binding.textSerial.text.toString()).apply()
     }
 
     override fun onStop() {
@@ -320,6 +330,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
 
         super.onStop()
+        sharedPreferences.edit().putString(getString(R.string.preference_file_imei),  binding.textImei.text.toString()).apply()
+        sharedPreferences.edit().putString(getString(R.string.preference_file_serial),  binding.textSerial.text.toString()).apply()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {

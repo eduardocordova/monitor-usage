@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:text="@string/titulo"
             android:width="200dp"
-
+            android:paddingBottom="30dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,6 +35,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/monitor_usage"/>
 
+        <TextView
+            android:id="@+id/imei_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/ingrese_imei"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="@id/text_imei"
+            app:layout_constraintBottom_toTopOf="@id/text_imei" />
+
         <EditText
             android:id="@+id/text_imei"
             android:layout_width="200dp"
@@ -44,6 +55,17 @@
             android:textSize="16sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/button"
             app:layout_constraintStart_toEndOf="@+id/button" />
+
+        <TextView
+            android:id="@+id/serial_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/ingrese_serial"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="@id/text_serial"
+            app:layout_constraintBottom_toTopOf="@id/text_serial" />
 
         <EditText
             android:id="@+id/text_serial"
