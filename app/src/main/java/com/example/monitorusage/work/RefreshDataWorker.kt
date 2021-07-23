@@ -106,6 +106,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
 
             //}
             {
+
             }
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
@@ -118,11 +119,18 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
                     Timber.d("WorkManager: Free space -> %s", freeSpace )
                     Timber.d("WorkManager: App usage -> %s", appUsage )
                     Timber.d("WorkManager: imei -> %s , serial -> %s", imei, serial )
+                    //val serialShared = sharedPreferences.getString("serial","serialshared")
+                    //val imeiShared = sharedPreferences.getString("imei","imeishared")
+                    //val serialShared = appContext.getSharedPreferences("serial", Context.MODE_PRIVATE).toString()
+                    //val imeiShared = this.applicationContext.getSharedPreferences("imei", Context.MODE_PRIVATE).toString()
+                    //Timber.d("WorkManager: application context imei -> %s , serial -> %s", imeiShared, serialShared )
+
                     // Send to server
                     try {
                         addTabletUsage(latitude = location?.latitude.toString(), longitude = location?.longitude.toString(),
                         batteryStatus = batteryStatus, freeSpace = freeSpace.toString(), imei = imei, installedApps = installedApps,
                         memoryUsage = memoryUsage, serial = serial, appUsage = appUsage)
+                        Timber.d("Workmanager: try addTabletUsage() serial -> %s", serial)
                     }catch (e : Exception){
                         Timber.d("Workmanager: error addTabletUsage() -> %s", e.toString())
                     }
@@ -391,7 +399,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
                 Toast.makeText(applicationContext,"Informacion correctamente enviada!", Toast.LENGTH_LONG).show()
             } else {
                 Timber.d("Error registering new user")
-                Toast.makeText(applicationContext,"Revise los datos, permisos y envie de nuevo", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext,"Revise los datos, permisos, no cierre Maxizapp", Toast.LENGTH_LONG).show()
             }
         }
     }

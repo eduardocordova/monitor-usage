@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                             listOfInstalledNames.add(packageManager.getApplicationLabel(app).toString())
                             listOfInstalledPackageNames.add(app.packageName)
                             listOfInstalledApps.add(app)
-                            Timber.d("App: List of installed apps %s", listOfInstalledApps.toString())
+                            //Timber.d("App: List of installed apps %s", listOfInstalledApps.toString())
                         }
 
                     }
@@ -310,6 +310,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val serial = sharedPreferences.getString(getString(R.string.preference_file_serial),  getString(R.string.ingrese_serial))
         binding.textSerial.setText(serial)
         binding.textImei.setText(imei)
+        IMEI = imei.toString()
+        SERIAL = serial.toString()
 
     }
 
@@ -320,6 +322,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         super.onPause()
         sharedPreferences.edit().putString(getString(R.string.preference_file_imei),  binding.textImei.text.toString()).apply()
         sharedPreferences.edit().putString(getString(R.string.preference_file_serial),  binding.textSerial.text.toString()).apply()
+
+
+        val imei = sharedPreferences.getString(getString(R.string.preference_file_imei),  getString(R.string.ingrese_imei))
+        val serial = sharedPreferences.getString(getString(R.string.preference_file_serial),  getString(R.string.ingrese_serial))
+        IMEI = imei.toString()
+        SERIAL = serial.toString()
+        Timber.d("WorkManager: onPause serial %s", SERIAL.toString())
     }
 
     override fun onStop() {
@@ -328,10 +337,31 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             foregroundOnlyLocationServiceBound = false
         }
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-
-        super.onStop()
         sharedPreferences.edit().putString(getString(R.string.preference_file_imei),  binding.textImei.text.toString()).apply()
         sharedPreferences.edit().putString(getString(R.string.preference_file_serial),  binding.textSerial.text.toString()).apply()
+
+
+        val imei = sharedPreferences.getString(getString(R.string.preference_file_imei),  getString(R.string.ingrese_imei))
+        val serial = sharedPreferences.getString(getString(R.string.preference_file_serial),  getString(R.string.ingrese_serial))
+        IMEI = imei.toString()
+        SERIAL = serial.toString()
+        Timber.d("WorkManager: onStop serial %s", SERIAL.toString())
+        Toast.makeText(applicationContext,"Mantenga abierta Maxizapp", Toast.LENGTH_LONG).show()
+        super.onStop()
+
+
+
+    }
+
+    override fun onDestroy() {
+
+        val imei = sharedPreferences.getString(getString(R.string.preference_file_imei),  getString(R.string.ingrese_imei))
+        val serial = sharedPreferences.getString(getString(R.string.preference_file_serial),  getString(R.string.ingrese_serial))
+        IMEI = imei.toString()
+        SERIAL = serial.toString()
+        Timber.d("WorkManager: onDestroy serial %s", SERIAL.toString())
+        Toast.makeText(applicationContext,"Mantenga abierta Maxizapp", Toast.LENGTH_LONG).show()
+        super.onDestroy()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
@@ -342,7 +372,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             )
         }
     }
-
 
     private val requestPermissionLauncher =
         registerForActivityResult(
