@@ -57,12 +57,19 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
         //val credential = TabletCredential.getCredential()
         //val repository = VideosRepository(database)
+        //sharedPreferences = applicationContext.getSharedPreferences(
+         //   R.string.preference_file_key.toString(), Context.MODE_PRIVATE)
+        //Timber.d("Workmanager: sharedPreferences  refresh: %s",R.string.preference_file_imei.toString())
+
         val installedApps = getInstalledApps()
         val batteryStatus = getBatteryStatus()
         val memoryUsage = getAvailableMemory(applicationContext)
         val freeSpace = getFreeSpace()
         val appUsage = getAppUsage()
         val imei = MainActivity.IMEI
+        //val imei =  sharedPreferences.getString(
+        //    "imei","defaultImei"
+        //).toString()
         val serial = MainActivity.SERIAL
 /*
         this.applicationContext.getSharedPreferences("imei", Context.MODE_PRIVATE)
@@ -111,14 +118,14 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     // Got last known location. In some rare situations this can be null.
-                    //Timber.d("WorkManager: Location -> %s", location?.latitude.toString())
-                    //Timber.d("WorkManager: Work request for sync is run")
-                    //Timber.d("WorkManager: Installed apps -> %s", installedApps.toString())
-                    //Timber.d("WorkManager: Battery status-> %s", batteryStatus)
-                    //Timber.d("WorkManager: Memory usage-> %s", memoryUsage)
-                    //Timber.d("WorkManager: Free space -> %s", freeSpace )
-                    //Timber.d("WorkManager: App usage -> %s", appUsage )
-                    //Timber.d("WorkManager: imei -> %s , serial -> %s", imei, serial )
+                    Timber.d("WorkManager: Location -> %s", location?.latitude.toString())
+                    Timber.d("WorkManager: Work request for sync is run")
+                    Timber.d("WorkManager: Installed apps -> %s", installedApps.toString())
+                    Timber.d("WorkManager: Battery status-> %s", batteryStatus)
+                    Timber.d("WorkManager: Memory usage-> %s", memoryUsage)
+                    Timber.d("WorkManager: Free space -> %s", freeSpace )
+                    Timber.d("WorkManager: App usage -> %s", appUsage )
+                    Timber.d("WorkManager: imei -> %s , serial -> %s", imei, serial )
                     //val serialShared = sharedPreferences.getString("serial","serialshared")
                     //val imeiShared = sharedPreferences.getString("imei","imeishared")
                     //val serialShared = appContext.getSharedPreferences("serial", Context.MODE_PRIVATE).toString()

@@ -17,6 +17,7 @@ class RestService {
         retrofit.addTabletUsage(tabletData).enqueue(
             object : Callback<TabletInfo> {
                 override fun onFailure(call: Call<TabletInfo>, t: Throwable) {
+
                     Timber.d("Workmanager REST Service %s", t.localizedMessage)
                     onResult(null)
                 }

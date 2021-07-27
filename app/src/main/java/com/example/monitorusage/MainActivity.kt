@@ -280,13 +280,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val serviceIntent = Intent(this, ForegroundOnlyLocationService::class.java)
         bindService(serviceIntent, foregroundOnlyServiceConnection, Context.BIND_AUTO_CREATE)
 
-        val sharedPrefSerial= this.applicationContext.getSharedPreferences(
-            getString(R.string.preference_file_serial), Context.MODE_PRIVATE)
+        //val sharedPrefSerial= this.applicationContext.getSharedPreferences(
+        //    getString(R.string.preference_file_serial), Context.MODE_PRIVATE)
 
         //val serial = sharedPrefSerial.getString(getString(R.string.preference_file_serial), getString(R.string.ingrese_serial))
 
-        val sharedPrefImei= this.applicationContext.getSharedPreferences(
-            getString(R.string.preference_file_imei), Context.MODE_PRIVATE)
+        //val sharedPrefImei= this.applicationContext.getSharedPreferences(
+        //    getString(R.string.preference_file_imei), Context.MODE_PRIVATE)
 
         // val imei = sharedPrefImei.getString(getString(R.string.preference_file_imei), getString(R.string.ingrese_imei))
 
@@ -312,6 +312,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         binding.textImei.setText(imei)
         IMEI = imei.toString()
         SERIAL = serial.toString()
+        Timber.d("WorkManager: onResume serial %s", SERIAL.toString())
 
     }
 
@@ -554,13 +555,24 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         if (!imei.isNullOrEmpty() && !serial.isNullOrEmpty()){
             layout.showSnackbar(view,"Enviando informacion...",Snackbar.LENGTH_LONG,null){}
 
-            sharedPreferences.edit().putString(getString(R.string.preference_file_imei),  binding.textImei.text.toString()).apply()
-            sharedPreferences.edit().putString(getString(R.string.preference_file_serial),  binding.textSerial.text.toString()).apply()
+            val serialEditor = sharedPreferences.edit()
+            serialEditor.putString(getString(R.string.preference_file_serial), binding.textSerial.text.toString()).apply()
 
-            IMEI = imei.toString()
-            SERIAL = serial.toString()
+            val imeiEditor = sharedPreferences.edit()
+            imeiEditor.putString(getString(R.string.preference_file_imei), binding.textImei.text.toString()).apply()
+
+            //sharedPreferences.edit().putString(getString(R.string.preference_file_imei),  binding.textImei.text.toString()).apply()
+            //sharedPreferences.edit().putString(getString(R.string.preference_file_serial),  binding.textSerial.text.toString()).apply()
+
+            Timber.d("Workmanager: serial shared on setuprecurring %s", sharedPreferences.getString(getString(R.string.preference_file_imei),"defimei") )
+
+            //IMEI = imei.toString()
+            //SERIAL = serial.toString()
+            SERIAL =  binding.textSerial.text.toString()
+            IMEI = binding.textImei.text.toString()
+
             setupRecurringWork()
-
+            Timber.d("Workmanager: serial on setuprecurring %s from edittext %s", SERIAL, binding.textSerial.text.toString())
         }
     }
 
