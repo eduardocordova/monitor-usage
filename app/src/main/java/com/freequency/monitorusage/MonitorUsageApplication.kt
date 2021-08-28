@@ -1,10 +1,10 @@
-package com.example.monitorusage
+package com.freequency.monitorusage
 
 import android.app.Application
 import android.os.Build
 import androidx.work.*
 
-import com.example.monitorusage.work.RefreshDataWorker
+import com.freequency.monitorusage.work.RefreshDataWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

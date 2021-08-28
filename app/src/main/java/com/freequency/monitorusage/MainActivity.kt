@@ -1,4 +1,4 @@
-package com.example.monitorusage
+package com.freequency.monitorusage
 
 import android.Manifest
 import android.app.ActivityManager
@@ -12,31 +12,25 @@ import android.location.Location
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.*
-import com.example.monitorusage.databinding.ActivityMainBinding
-import com.example.monitorusage.work.RefreshDataWorker
+import com.freequency.monitorusage.databinding.ActivityMainBinding
+import com.freequency.monitorusage.work.RefreshDataWorker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
-import kotlin.math.round
 
 private const val TAG = "MainActivity"
 private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
@@ -96,7 +90,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 
         foregroundOnlyLocationButton = binding.foregroundOnlyLocationButton
-        outputTextView = binding.outputTextView
+        // in UI Branch disabled outputTextView = binding.outputTextView
 
         foregroundOnlyUsageStatsButton = binding.foregroundOnlyUsageStatsButton
 
@@ -176,8 +170,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
 
 
-        binding.outputTextViewApps.movementMethod = ScrollingMovementMethod()
-        binding.outputTextViewApps.text = listOfInstalledNames.toString()
+        // in UI Branch disabled binding.outputTextViewApps.movementMethod = ScrollingMovementMethod()
+        // in UI Branch disabled binding.outputTextViewApps.text = listOfInstalledNames.toString()
 
         // get Battery Intent
         val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
@@ -191,14 +185,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
             level * 100 / scale.toFloat()
         }
-        binding.outputTextBattery.text = batteryPct.toString()
+        // in UI Branch disabled binding.outputTextBattery.text = batteryPct.toString()
 
         //get Memory Info RAM
         val availableMemory = getAvailableMemory().availMem / 1024
         val totalMemory = getAvailableMemory().totalMem / 1024
         val usedMemory = totalMemory - availableMemory
 
-        binding.outputTextUsedMemory.text = "$availableMemory KB disponible, $totalMemory KB total, $usedMemory KB utilizado"
+        // in UI Branch disabled binding.outputTextUsedMemory.text = "$availableMemory KB disponible, $totalMemory KB total, $usedMemory KB utilizado"
 
         // free space
         val freeInternalMemory = Environment.getDataDirectory()
@@ -207,7 +201,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         //val totalSpace = Environment.getRootDirectory().totalSpace
         val totalFreeSpace = freeExternalMemory + freeSpace
 
-        binding.outputTextFreeSpace.text = "$totalFreeSpace KB libres "
+        // in UI Branch disabled binding.outputTextFreeSpace.text = "$totalFreeSpace KB libres "
 
 
 
@@ -244,9 +238,15 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         }
         if (usageList.isNullOrEmpty()){
-            binding.outputTextViewUsage.text = "Debe habilitar permiso de uso para funcionamiento central"
+            Snackbar.make(
+                binding.mainLayout,
+                R.string.permission_usage,
+                Snackbar.LENGTH_LONG
+            )
+
+            // in UI Branch disabled binding.outputTextViewUsage.text = "Debe habilitar permiso de uso para funcionamiento central"
         }else{
-            binding.outputTextViewUsage.text = usageList.distinct().toString()
+            // in UI Branch disabled binding.outputTextViewUsage.text = usageList.distinct().toString()
         }
 
 
@@ -259,6 +259,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             Timber.plant(Timber.DebugTree())
             //setupRecurringWork()
         }
+
     }
 
 
@@ -303,7 +304,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         LocalBroadcastManager.getInstance(this).registerReceiver(
             foregroundOnlyBroadcastReceiver,
             IntentFilter(
-                ForegroundOnlyLocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
+                ForegroundOnlyLocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST
+            )
         )
 
         val imei = sharedPreferences.getString(getString(R.string.preference_file_imei),  getString(R.string.ingrese_imei))
@@ -577,8 +579,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private fun logResultsToScreen(output: String) {
-        val outputWithPreviousLogs = "$output\n${outputTextView.text}"
-        outputTextView.text = outputWithPreviousLogs
+        //val outputWithPreviousLogs = "$output\n${outputTextView.text}"
+        //outputTextView.text = outputWithPreviousLogs
     }
 
 
@@ -636,7 +638,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             .build()
 
         //val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(1, TimeUnit.DAYS)
-        val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(15, TimeUnit.MINUTES)
+        val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(6, TimeUnit.HOURS)
+        //val repeatingRequest = PeriodicWorkRequestBuilder<RefreshDataWorker>(15, TimeUnit.MINUTES)
             //.setConstraints(constraints)
             .build()
 

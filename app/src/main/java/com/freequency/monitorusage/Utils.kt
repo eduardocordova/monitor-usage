@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.monitorusage
+package com.freequency.monitorusage
 
 import android.content.Context
 import android.location.Location

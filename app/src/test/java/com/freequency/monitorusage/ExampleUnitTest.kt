@@ -1,4 +1,4 @@
-package com.example.monitorusage
+package com.freequency.monitorusage
 
 import org.junit.Test
 

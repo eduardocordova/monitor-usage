@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.example.monitorusage.work
+package com.freequency.monitorusage.work
 
 import android.Manifest
+import android.app.Activity
 import android.app.ActivityManager
 import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.SharedPreferences
+import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.icu.util.Calendar
 import android.location.Location
+import android.location.LocationManager
 import android.os.BatteryManager
 import android.os.Environment
 import android.view.View
@@ -35,42 +34,63 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.monitorusage.MainActivity
-import com.example.monitorusage.R
-import com.example.monitorusage.model.TabletInfo
-import com.example.monitorusage.network.RestService
-import com.example.monitorusage.showSnackbar
-import com.google.android.gms.location.LocationServices
+import com.freequency.monitorusage.MainActivity
+import com.freequency.monitorusage.model.TabletInfo
+import com.freequency.monitorusage.network.RestService
+import com.freequency.monitorusage.repository.PreferenceHelper
+import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import retrofit2.HttpException
 import timber.log.Timber
 import java.text.DecimalFormat
 
+
+import com.google.android.gms.common.api.ResolvableApiException
+
+
 class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
         CoroutineWorker(appContext, params) {
 
     private lateinit var sharedPreferences: SharedPreferences
     companion object {
-        const val WORK_NAME = "com.example.monitorusage.work.RefreshDataWorker"
+        const val WORK_NAME = "com.freequency.monitorusage.work.RefreshDataWorker"
     }
     override suspend fun doWork(): Result {
         //val credential = TabletCredential.getCredential()
         //val repository = VideosRepository(database)
         //sharedPreferences = applicationContext.getSharedPreferences(
-         //   R.string.preference_file_key.toString(), Context.MODE_PRIVATE)
+        //   R.string.preference_file_key.toString(), Context.MODE_PRIVATE)
         //Timber.d("Workmanager: sharedPreferences  refresh: %s",R.string.preference_file_imei.toString())
+        lateinit var prefHelper: PreferenceHelper
+
+        prefHelper = PreferenceHelper(context = applicationContext)
 
         val installedApps = getInstalledApps()
         val batteryStatus = getBatteryStatus()
         val memoryUsage = getAvailableMemory(applicationContext)
         val freeSpace = getFreeSpace()
         val appUsage = getAppUsage()
-        val imei = MainActivity.IMEI
+        var imei = MainActivity.IMEI
         //val imei =  sharedPreferences.getString(
         //    "imei","defaultImei"
         //).toString()
-        val serial = MainActivity.SERIAL
+        var serial = MainActivity.SERIAL
+
+        if (imei == "user") {
+            imei =
+                prefHelper.customPrefs("com.freequency.android.while_in_use_location.PREFERENCE_FILE_KEY")
+                    .getString("imei", "defIMEI").toString()
+        }
+        if (serial == "pass") {
+            serial =
+                prefHelper.customPrefs("com.freequency.android.while_in_use_location.PREFERENCE_FILE_KEY")
+                    .getString("serial", "defSerial").toString()
+
+        }
+        //val IMEI = prefHelper.customPrefs("com.freequency.android.while_in_use_location.PREFERENCE_FILE_KEY").getString("imei","defIMEI").toString()
+        //val SERIAL = prefHelper.customPrefs("com.freequency.android.while_in_use_location.PREFERENCE_FILE_KEY").getString("serial","defSerial").toString()
+
 /*
         this.applicationContext.getSharedPreferences("imei", Context.MODE_PRIVATE)
             .also { sharedPreferences = it }
@@ -91,9 +111,24 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
         // val serial = "T200021050642701"
         // val imei = "358782670000224"
 
-        var fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
+        var fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(applicationContext)
+
+
 
         Timber.d("WorkManager: Work request for setup is run")
+
+
+        val customPref = "com.freequency.android.while_in_use_location.PREFERENCE_FILE_KEY"
+        val lastLatKey = "last_lat"
+        val lastLongKey = "last_long"
+        var lastLat = prefHelper.customPrefs(customPref).getString(lastLatKey, "null").toString()
+        var lastLong = prefHelper.customPrefs(customPref).getString(lastLongKey, "null").toString()
+
+        var result = ""
+        val sucess = "sucess"
+        val retry = "restry"
+        val fail = "fail"
         try {
             if (ActivityCompat.checkSelfPermission(
                     applicationContext,
@@ -115,6 +150,9 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
             {
 
             }
+
+
+
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     // Got last known location. In some rare situations this can be null.
@@ -123,9 +161,9 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
                     Timber.d("WorkManager: Installed apps -> %s", installedApps.toString())
                     Timber.d("WorkManager: Battery status-> %s", batteryStatus)
                     Timber.d("WorkManager: Memory usage-> %s", memoryUsage)
-                    Timber.d("WorkManager: Free space -> %s", freeSpace )
-                    Timber.d("WorkManager: App usage -> %s", appUsage )
-                    Timber.d("WorkManager: imei -> %s , serial -> %s", imei, serial )
+                    Timber.d("WorkManager: Free space -> %s", freeSpace)
+                    Timber.d("WorkManager: App usage -> %s", appUsage)
+                    Timber.d("WorkManager: imei -> %s , serial -> %s", imei, serial)
                     //val serialShared = sharedPreferences.getString("serial","serialshared")
                     //val imeiShared = sharedPreferences.getString("imei","imeishared")
                     //val serialShared = appContext.getSharedPreferences("serial", Context.MODE_PRIVATE).toString()
@@ -133,27 +171,230 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
                     //Timber.d("WorkManager: application context imei -> %s , serial -> %s", imeiShared, serialShared )
 
                     // Send to server
+
                     try {
-                        addTabletUsage(latitude = location?.latitude.toString(), longitude = location?.longitude.toString(),
-                        batteryStatus = batteryStatus, freeSpace = freeSpace.toString(), imei = imei, installedApps = installedApps,
-                        memoryUsage = memoryUsage, serial = serial, appUsage = appUsage)
-                        Timber.d("Workmanager: try addTabletUsage() serial -> %s", serial)
-                    }catch (e : Exception){
-                        Timber.d("Workmanager: error addTabletUsage() -> %s", e.toString())
+                        // Forcing location null
+                        // location == null
+                        if (location != null) {
+                            Timber.d(
+                                "Workmanager: try addTabletUsage() last lat bef -> %s",
+                                lastLat
+                            )
+                            if (!location.latitude.toString().isNullOrEmpty()) {
+                                Timber.d(
+                                    "Workmanager: lat to be set is -> %s",
+                                    location.latitude.toString()
+                                )
+                                prefHelper.customPrefs(customPref).edit()
+                                    .putString(lastLatKey, location.latitude.toString()).apply()
+                                Timber.d(
+                                    "Workmanager: last lat set is -> %s",
+                                    prefHelper.customPrefs(customPref).getString(lastLatKey, "null")
+                                        .toString()
+                                )
+                                lastLat =
+                                    prefHelper.customPrefs(customPref).getString(lastLatKey, "null")
+                                        .toString()
+                            }
+                            if (!location.longitude.toString().isNullOrEmpty()) {
+                                prefHelper.customPrefs(customPref).edit()
+                                    .putString(lastLongKey, location.longitude.toString()).apply()
+                                Timber.d(
+                                    "Workmanager: last long set is -> %s",
+                                    prefHelper.customPrefs(customPref)
+                                        .getString(lastLongKey, "null").toString()
+                                )
+                                lastLong = prefHelper.customPrefs(customPref)
+                                    .getString(lastLongKey, "null").toString()
+                            }
+                        } else {
+                            Toast.makeText(
+                                applicationContext,
+                                "Aun no se activa la ubicacion",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            Timber.d("WorkManager: Work request location null")
+
+                            result = "retry"
+
+
+                        }
+                        Timber.d("Workmanager Location: try waiting for location %s", location?.latitude.toString())
+                        //Timber.d("Workmanager Location: try while forcing null %s",location)
+                        Timber.d("Workmanager Location: lastLat %s",lastLat)
+                        // Forcing lastLat emtpy
+                        // lastLat = ""
+                        //Timber.d("Workmanager Location forcing lastLat empty -> %s", lastLat)
+                        while (lastLat.isNullOrEmpty()) {
+                            Timber.d(
+                                "Workmanager Location inner: try waiting for location?.latitude.toString().isNullOrEmpty() %s",
+                                location?.latitude.toString()
+                            )
+                            val locationManager: LocationManager =
+                                applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                            var providers = locationManager.getProviders(true)
+                            if (providers.isNullOrEmpty()) {
+                                providers = locationManager.allProviders
+                                Timber.d("Workmanager Location providers are empty")
+                            }
+
+                            //val providers: List<String> = Provider
+                            var bestLocation: Location? = null
+                            Timber.d("Workmanager Location: providers")
+                            for (provider in providers) {
+                                val l: Location? = locationManager.getLastKnownLocation(provider)
+                                Timber.d(
+                                    "Workmanager Location: last known location, provider: %s, location: %s",
+                                    provider,
+                                    l
+                                )
+                                if (l == null) {
+                                    continue
+                                }
+                                if (bestLocation == null
+                                    || l.accuracy < bestLocation.accuracy
+                                ) {
+                                    Timber.d(
+                                        "Workmanager Location: found best last known location: %s",
+                                        l
+                                    )
+                                    bestLocation = l
+                                    location?.set(bestLocation)
+                                    prefHelper.customPrefs(customPref).edit()
+                                        .putString(lastLatKey, location?.latitude.toString())
+                                        .apply()
+                                    lastLat = prefHelper.customPrefs(customPref)
+                                        .getString(lastLatKey, "null").toString()
+                                    prefHelper.customPrefs(customPref).edit()
+                                        .putString(lastLongKey, location?.longitude.toString())
+                                        .apply()
+                                    lastLong = prefHelper.customPrefs(customPref)
+                                        .getString(lastLongKey, "null").toString()
+                                    break
+                                }
+                            }
+                            //Timber.d("Workmanager Location: forcing best location null")
+                            //bestLocation = null
+                            if (bestLocation == null) {
+
+                                Timber.d("Workmanager Location: bestLocation == null")
+                                fusedLocationClient.flushLocations()
+                                //getLatestLocation()
+                                val locationRequest = createLocationRequest()
+                                val builder = LocationSettingsRequest.Builder()
+                                    .addLocationRequest(locationRequest)
+
+                                val client: SettingsClient = LocationServices.getSettingsClient(applicationContext)
+                                val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+
+                                task.addOnSuccessListener { response : LocationSettingsResponse ->
+                                    val result = task.getResult()
+
+                                    if (result.locationSettingsStates.isLocationPresent){
+                                        Timber.d("Workmanager Location Present")
+                                    }else{
+                                        Timber.d("Workmanager Location not present")
+                                    }
+                                }
+                                task.addOnFailureListener{
+                                        exception ->
+                                    if (exception is ResolvableApiException){
+                                        // Location settings are not satisfied, but this can be fixed
+                                        // by showing the user a dialog.
+                                        try {
+                                            // Show the dialog by calling startResolutionForResult(),
+                                            // and check the result in onActivityResult().
+                                            exception.startResolutionForResult(MainActivity as Activity, 0x1)
+                                        } catch (sendEx: IntentSender.SendIntentException) {
+                                            // Ignore the error.
+                                        }
+                                    }
+
+                                }
+
+                                continue
+                            }
+
+                        }
+                        Timber.d("Workmanager: try addTabletUsage() last lat aft -> %s", lastLat)
+                        Timber.d("Workmanager: setting result")
+                        if (!lastLat.isNullOrEmpty()){
+                            result = sucess
+                        }else {
+                            result = retry
+                        }
+                        Timber.d("Workmanager: result ->  %s", result)
+
+
+                    } catch (e: Exception) {
+                        Timber.d("Workmanager: error () -> %s", e.toString())
+                        result = retry
                     }
+                // here still
+                    Timber.d("Workmanager when result is %s", result)
+                    when (result) {
+                        retry -> {
+                            result = retry
+                            Timber.d("Workmanager result is retry inside fusedlocation")
+                        }
+                        sucess -> {
+                            //lastLat = "null"
+                            Timber.d("Workmanager: try addTabletUsage() lastLat -> %s", lastLat)
+
+                            if ( lastLat !== "null"){
+                                addTabletUsage(
+                                    latitude = lastLat,
+                                    longitude = lastLong,
+                                    batteryStatus = batteryStatus,
+                                    freeSpace = freeSpace.toString(),
+                                    imei = imei,
+                                    installedApps = installedApps,
+                                    memoryUsage = memoryUsage,
+                                    serial = serial,
+                                    appUsage = appUsage
+                                )
+                                Timber.d("Workmanager: try addTabletUsage() serial -> %s", serial)
+                            }else{
+                                Timber.d("Workmanager: else fail but retry")
+                                Toast.makeText(applicationContext,"Envio programado", Toast.LENGTH_LONG).show()
+                                result = retry
+                            }
 
 
+                        }
+                        else -> {
+                            Timber.d("Workmanager: else fail but retry")
+                            result = retry
+                            Toast.makeText(applicationContext,"Envio programado", Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
+            Timber.d("WorkManager: result  out ->  %s", result)
 
-            //Timber.d("WorkManager: location -> latitude %s", location.result.latitude)
+            when (result) {
+                retry -> {
+                    Timber.d("WorkManager: Work request for retry")
+                    return Result.retry()
+                }
+                sucess -> {
+                    Timber.d("WorkManager: Work request succeded")
+                    return Result.success()
+                }
+                else -> {
+                    Timber.d("WorkManager: Work request  failed")
+                    return Result.failure()
+                }
+            }
 
         } catch (e: HttpException) {
             Timber.d("WorkManager: Work request for retry is run")
             return Result.retry()
         }
 
-        return Result.success()
+
     }
+
+
 
     private fun getAppUsage(): String {
         // get Usage for installed apps
@@ -270,7 +511,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
         val addOnSuccessListener = fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 // Got last known location. In some rare situations this can be null.
-                Timber.d("WorkManager: Location -> %s", location.toString())
+                Timber.d("WorkManager: Location getlastocation best location null -> %s", location.toString())
                 return@addOnSuccessListener
             }
         return addOnSuccessListener
@@ -411,6 +652,14 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
         }
     }
 
+    fun createLocationRequest() : LocationRequest? {
+        val locationRequest = LocationRequest.create()?.apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+        return locationRequest
+    }
 
 
 

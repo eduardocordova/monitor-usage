@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.monitorusage
+package com.freequency.monitorusage
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -31,6 +31,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.freequency.monitorusage.repository.PreferenceHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -77,6 +78,7 @@ class ForegroundOnlyLocationService : Service() {
     override fun onCreate() {
         Log.d(TAG, "onCreate()")
 
+
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Step 1.2, Review the FusedLocationProviderClient.
@@ -96,6 +98,27 @@ class ForegroundOnlyLocationService : Service() {
                 super.onLocationResult(locationResult)
                 // TODO: save to a database
                 currentLocation = locationResult.lastLocation
+
+                lateinit var prefHelper: PreferenceHelper
+
+                prefHelper = PreferenceHelper(context = applicationContext)
+                val customPref = "com.freequency.android.while_in_use_location.PREFERENCE_FILE_KEY"
+                val lastLatKey = "last_lat"
+                val lastLongKey = "last_long"
+                prefHelper.customPrefs(customPref).getString(lastLatKey,"null").toString()
+                prefHelper.customPrefs(customPref).getString(lastLongKey,"null").toString()
+
+
+                if (locationResult != null) {
+                    if (!locationResult.lastLocation.latitude.toString().isNullOrEmpty()){
+                        prefHelper.customPrefs(customPref).edit().putString(lastLatKey,locationResult.lastLocation.latitude.toString()).apply()
+                    }
+                    if (!locationResult.lastLocation.longitude.toString().isNullOrEmpty()){
+                        prefHelper.customPrefs(customPref).edit().putString(lastLongKey,locationResult.lastLocation.longitude.toString()).apply()
+                    }
+                }
+
+
                 // TODO: listen for changes to a database
                 val intent = Intent(ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
                 intent.putExtra(EXTRA_LOCATION, currentLocation)
@@ -265,6 +288,25 @@ class ForegroundOnlyLocationService : Service() {
         val activityPendingIntent = PendingIntent.getActivity(
             this, 0, launchActivityIntent, 0)
 
+
+        lateinit var prefHelper: PreferenceHelper
+
+        prefHelper = PreferenceHelper(context = applicationContext)
+        val customPref = "com.freequency.android.while_in_use_location.PREFERENCE_FILE_KEY"
+        val lastLatKey = "last_lat"
+        val lastLongKey = "last_long"
+        prefHelper.customPrefs(customPref).getString(lastLatKey,"null").toString()
+        prefHelper.customPrefs(customPref).getString(lastLongKey,"null").toString()
+
+        if (location != null) {
+            if (!location.latitude.toString().isNullOrEmpty()){
+                prefHelper.customPrefs(customPref).edit().putString(lastLatKey,location.latitude.toString()).apply()
+            }
+            if (!location.longitude.toString().isNullOrEmpty()){
+                prefHelper.customPrefs(customPref).edit().putString(lastLongKey,location.longitude.toString()).apply()
+            }
+        }
+
         // 4. Build and issue the notification.
         // Notification Channel Id is ignored for Android pre O (26).
         val notificationCompatBuilder =
@@ -302,7 +344,7 @@ class ForegroundOnlyLocationService : Service() {
     companion object {
         private const val TAG = "ForegroundOnlyLocationService"
 
-        private const val PACKAGE_NAME = "com.example.android.whileinuselocation"
+        private const val PACKAGE_NAME = "com.freequency.android.whileinuselocation"
 
         internal const val ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST =
             "$PACKAGE_NAME.action.FOREGROUND_ONLY_LOCATION_BROADCAST"

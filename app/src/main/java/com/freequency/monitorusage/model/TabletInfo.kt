@@ -1,4 +1,4 @@
-package com.example.monitorusage.model
+package com.freequency.monitorusage.model
 
 import com.google.gson.annotations.SerializedName
 

@@ -6,6 +6,8 @@
     <string name="location_updates_label">Actualizacion de ubicacion</string>
 
     <string name="permission_rationale">Permisos de ubicacion necesarios para funcionamiento central</string>
+    <string name="permission_usage">Debe habilitar permiso de uso para funcionamiento central</string>
+
     <string name="permission_denied_explanation">Permisos negados, pero necesarios para funcionamiento central.</string>
     <string name="settings">Ajustes</string>
     <string name="ok">OK</string>
@@ -17,8 +19,8 @@
 
     <string name="location_updated">Ubacion actualizada: %1$s</string>
 
-    <string name="preference_file_key">com.example.android.while_in_use_location.PREFERENCE_FILE_KEY</string>
-    <string name="no_location_text">Sin ubacion actual</string>
+    <string name="preference_file_key">com.freequency.android.while_in_use_location.PREFERENCE_FILE_KEY</string>
+    <string name="no_location_text">Sin ubicacion actual</string>
 
     <string name="permission_required">Acceso a camara requerido para mostrar avance de camara.</string>
     <string name="permission_granted">Permiso otorgado, puede usar la camara.</string>
